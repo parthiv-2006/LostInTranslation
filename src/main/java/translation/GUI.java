@@ -58,9 +58,31 @@ public class GUI {
             resultPanel.add(resultLabel);
 
 
-            Runnable runTranslation = new Runnable() {
+            list.addListSelectionListener(new ListSelectionListener() {
                 @Override
-                public void run() {
+                public void valueChanged(ListSelectionEvent e) {
+                    if (!e.getValueIsAdjusting()) {
+                        if (languageComboBox.getSelectedItem() == null) return;
+
+                        String language = languageCodeConverter.fromLanguage((String) languageComboBox.getSelectedItem());
+
+                        int index = list.getSelectedIndex();
+                        String countryCode = translator.getCountryCodes().get(index);
+
+                        Translator translator = new JSONTranslator();
+
+                        String result = translator.translate(countryCode, language);
+                        if (result == null) {
+                            result = "no translation found!";
+                        }
+                        resultLabel.setText(result);
+                    }
+                }
+            });
+
+            languageComboBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
                     if (languageComboBox.getSelectedItem() == null) return;
 
                     String language = languageCodeConverter.fromLanguage((String) languageComboBox.getSelectedItem());
@@ -75,23 +97,6 @@ public class GUI {
                         result = "no translation found!";
                     }
                     resultLabel.setText(result);
-                }
-            };
-
-
-            list.addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    if (!e.getValueIsAdjusting()) {
-                        runTranslation.run();
-                    }
-                }
-            });
-
-            languageComboBox.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    runTranslation.run();
                 }
             });
 
